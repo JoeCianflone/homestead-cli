@@ -1,4 +1,9 @@
 {
+    "name": "studiocianflone/homestead-cli",
+    "description": "Simple CLI tool for Homestead",
+    "keywords": ["cli", "laravel", "homestead"],
+    "license": "MIT",
+    "type": "project",
     "autoload": {
         "classmap": [],
         "psr-4": {
