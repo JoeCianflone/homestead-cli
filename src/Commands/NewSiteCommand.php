@@ -1,25 +1,15 @@
 <?php
 namespace App\Commands;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use App\Core\Container;
 use Symfony\Component\Yaml\Yaml;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
 
 class NewSiteCommand extends Command {
-
-   private $config;
-
-   public function __construct($config)
-   {
-      parent::__construct();
-
-      $this->config = $config;
-   }
 
    protected function configure()
    {
@@ -37,19 +27,8 @@ class NewSiteCommand extends Command {
 
    protected function execute(InputInterface $input, OutputInterface $output)
    {
-      /**
-       * find and open our homestead.yaml file
-       * parse the yaml into something PHP can read
-       * add folders, sites and database to the PHP
-       *
-       * open hosts file
-       * add new entry
-       *
-       * save both Hosts and YAML
-       */
-
-      $yamlHomestead = Yaml::parseFile($this->config['homestead_path'] .'/'. $this->config['homestead_yaml']);
-      $toLocation = $this->config['vm_base_path'] . '/' . $input->getArgument('folder');
+      $yamlHomestead = Yaml::parseFile(Container::get('config')['homestead_path'] .'/'. Container::get('config')['homestead_yaml']);
+      $toLocation = Container::get('config')['vm_base_path'] . '/' . $input->getArgument('folder');
 
       $yamlHomestead['folders'][] = [
          'map' => $input->getArgument('folder'),
@@ -69,14 +48,14 @@ class NewSiteCommand extends Command {
          $yamlHomestead['databases'][] = $input->getOption('database');
       }
 
-      $fsHosts = new Filesystem(new Local($this->config['hosts_path']));
-      $fsHomestead = new Filesystem(new Local($this->config['homestead_path']));
+      $fsHosts = new Filesystem(new Local(Container::get('config')['hosts_path']));
+      $fsHomestead = new Filesystem(new Local(Container::get('config')['homestead_path']));
 
-      $hosts = $fsHosts->read($this->config['hosts_file']);
+      $hosts = $fsHosts->read(Container::get('config')['hosts_file']);
       $hosts .= PHP_EOL;
-      $hosts .= $this->config['vm_ip'] . ' ' . $input->getArgument('uri');
+      $hosts .= Container::get('config')['vm_ip'] . ' ' . $input->getArgument('uri');
 
-      $fsHomestead->put($this->config['homestead_yaml'], Yaml::dump($yamlHomestead));
-      $fsHosts->put($this->config['hosts_file'], $hosts);
+      $fsHomestead->put(Container::get('config')['homestead_yaml'], Yaml::dump($yamlHomestead));
+      $fsHosts->put(Container::get('config')['hosts_file'], $hosts);
    }
 }
