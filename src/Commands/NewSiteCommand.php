@@ -1,24 +1,33 @@
 <?php
 namespace App\Commands;
 
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use App\Core\Container;
 use Symfony\Component\Yaml\Yaml;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Output\OutputInterface;
+use App\Transformers\{HostsTransformer, HomesteadTransformer};
+use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
+
 
 class NewSiteCommand extends Command {
 
-   private $config;
+   private $fs = [];
 
-   public function __construct($config)
+   public function __construct()
    {
       parent::__construct();
 
-      $this->config = $config;
+      $this->fs['homestead'] = new Filesystem(new Local(Container::get('config')['homestead_path']));
+      $this->fs['hosts'] = new Filesystem(new Local(Container::get('config')['hosts_path']));
+   }
+
+   protected function initialize(InputInterface $input, OutputInterface $output)
+   {
+      if (! is_writable(Container::get('config')['hosts_path'].'/'.Container::get('config')['hosts_file'])) {
+         throw new \Exception("Cannot write to Host file");
+      }
    }
 
    protected function configure()
@@ -37,46 +46,18 @@ class NewSiteCommand extends Command {
 
    protected function execute(InputInterface $input, OutputInterface $output)
    {
-      /**
-       * find and open our homestead.yaml file
-       * parse the yaml into something PHP can read
-       * add folders, sites and database to the PHP
-       *
-       * open hosts file
-       * add new entry
-       *
-       * save both Hosts and YAML
-       */
+      $homestead = new HomesteadTransformer(Yaml::parseFile(Container::get('config')['homestead_path'] .'/'. Container::get('config')['homestead_yaml']));
+      $updatedYamlFile = $homestead->transform($input);
 
-      $yamlHomestead = Yaml::parseFile($this->config['homestead_path'] .'/'. $this->config['homestead_yaml']);
-      $toLocation = $this->config['vm_base_path'] . '/' . $input->getArgument('folder');
+      $hosts = new HostsTransformer($this->fs['hosts']->read(Container::get('config')['hosts_file']));
+      $updatedHostsFile = $hosts->transform($input);
 
-      $yamlHomestead['folders'][] = [
-         'map' => $input->getArgument('folder'),
-         'to' => $toLocation
-      ];
+      $this->writeFilesToDisk(Yaml::dump($updatedYamlFile), $updatedHostsFile);
+   }
 
-      if ($input->getOption('pubdir')) {
-         $toLocation .= '/'.$input->getOption('pubdir');
-      }
-
-      $yamlHomestead['sites'][] = [
-         'map' => $input->getArgument('uri'),
-         'to' => $toLocation
-      ];
-
-      if ($input->getOption('database')) {
-         $yamlHomestead['databases'][] = $input->getOption('database');
-      }
-
-      $fsHosts = new Filesystem(new Local($this->config['hosts_path']));
-      $fsHomestead = new Filesystem(new Local($this->config['homestead_path']));
-
-      $hosts = $fsHosts->read($this->config['hosts_file']);
-      $hosts .= PHP_EOL;
-      $hosts .= $this->config['vm_ip'] . ' ' . $input->getArgument('uri');
-
-      $fsHomestead->put($this->config['homestead_yaml'], Yaml::dump($yamlHomestead));
-      $fsHosts->put($this->config['hosts_file'], $hosts);
+   private function writeFilesToDisk($homestead, $hosts)
+   {
+      $this->fs['homestead']->put(Container::get('config')['homestead_yaml'], $homestead);
+      $this->fs['hosts']->put(Container::get('config')['hosts_file'], $hosts);
    }
 }
