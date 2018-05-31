@@ -6,5 +6,6 @@ return [
    'hosts_path' => '/etc',
    'hosts_file' => 'hosts',
    'vm_ip' => '192.168.10.10',
-   'vm_base_path' => '/home/vagrant/sites'
+   'vm_base_path' => '/home/vagrant/sites',
+   'local_base_path' => '~/Sites',
 ];

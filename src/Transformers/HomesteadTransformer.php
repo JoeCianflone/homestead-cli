@@ -3,13 +3,14 @@
 namespace App\Transformers;
 
 use App\Core\Container;
+use App\Transformers\BaseTransformer;
 use Symfony\Component\Console\Input\InputInterface;
 
-class HomesteadTransformer {
+class HomesteadTransformer extends BaseTransformer {
 
    private $file;
 
-   public function __construct($file)
+   public function __construct(string $file)
    {
       $this->file = $file;
    }
@@ -23,29 +24,30 @@ class HomesteadTransformer {
       return $this->file;
    }
 
-   private function updateFolders($file, $folder)
+   private function updateFolders(string $file, string $folder)
    {
-      $location = $this->getLocation($folder);
+      $map = $this->getLocalPath($folder);
+      $to = $this->getVMPath($folder);
 
-      if ($this->foundInColumn($folder, $file, 'map') || $this->foundInColumn($location, $file, 'to')) {
+      if ($this->foundInColumn($map, $file, 'map') || $this->foundInColumn($to, $file, 'to')) {
          throw new \Exception("Folder or VM Location already exists in Folders...aborting");
       }
 
-      return $this->doMapping($file, $folder, $location);
+      return $this->doMapping($file, $map, $to);
    }
 
    private function updateSites($file, $folder, $uri, $pubdir='')
    {
-      $location = $this->getLocation($folder, $pubdir);
+      $to = $this->getVMPath($folder, $pubdir);
 
-      if ($this->foundInColumn($uri, $file, 'map') || $this->foundInColumn($location, $file, 'to')) {
+      if ($this->foundInColumn($uri, $file, 'map') || $this->foundInColumn($to, $file, 'to')) {
          throw new \Exception("URI or Folder Name already exists in sites...aborting");
       }
 
-      return $this->doMapping($file, $uri, $location);
+      return $this->doMapping($file, $uri, $to);
    }
 
-   private function updateDatabase($file, $dbName)
+   private function updateDatabase(string $file, string $dbName)
    {
       if (in_array($dbName, $file)) {
          throw new \Exception('Database Already Exists...Aborting');
@@ -58,7 +60,7 @@ class HomesteadTransformer {
       return $file;
    }
 
-   private function foundInColumn($needle, $haystack, $column)
+   private function foundInColumn(string $needle, string $haystack, string $column)
    {
       return in_array($needle, array_column($haystack, $column));
    }
@@ -73,8 +75,13 @@ class HomesteadTransformer {
       return $file;
    }
 
-   private function getLocation($folder, $pubdir='')
+   private function getLocalPath(string $folder) : string
    {
-      return trim(Container::get('config')['vm_base_path'] .'/'.$folder.'/'.$pubdir,'/');
+      return trim(Container::get('config')['local_base_path'] . '/'. $folder, '/');
+   }
+
+   private function getVMPath(string $folder, string $pubdir='') : string
+   {
+      return rtrim(Container::get('config')['vm_base_path'] .'/'.$folder.'/'.$pubdir, '/');
    }
 }
