@@ -4,12 +4,13 @@ require __DIR__.'/vendor/autoload.php';
 require __DIR__.'/src/Core/bootstrap.php';
 
 use App\Core\Container;
+use App\Commands\FreshCommand;
 use App\Commands\NewSiteCommand;
 use Symfony\Component\Console\Application;
 
 
 $application = new Application();
 
-$application->add(new NewSiteCommand(Container::get('config')));
-
+$application->add(new FreshCommand());
+$application->add(new NewSiteCommand());
 $application->run();

@@ -4,7 +4,6 @@ namespace App\Commands;
 use App\Core\Container;
 use Symfony\Component\Yaml\Yaml;
 use League\Flysystem\Filesystem;
-use App\Core\Config;
 use League\Flysystem\Adapter\Local;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,24 +11,16 @@ use App\Transformers\{HostsTransformer, HomesteadTransformer};
 use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
 
 
-class NewSiteCommand extends Command {
-
-   private $homesteadFS;
-   private $hostsFS;
+class NewSiteCommand extends BaseCommand {
 
    public function __construct()
    {
       parent::__construct();
-
-      $this->homesteadFS = new Filesystem(new Local(Container::get('config')['homestead_path']));
-      $this->hostsFS = new Filesystem(new Local(Container::get('config')['hosts_path']));
    }
 
    protected function initialize(InputInterface $input, OutputInterface $output)
    {
-      // if (! is_writable(Container::get('config')['hosts_path'].'/'.Container::get('config')['hosts_file'])) {
-      //    throw new \Exception("Cannot write to Host file");
-      // }
+      $this->checkConfig()->checkHost();
    }
 
    protected function configure()
@@ -59,7 +50,7 @@ class NewSiteCommand extends Command {
 
    private function writeFilesToDisk($homestead, $hosts)
    {
-      $this->homesteadFS->put(Container::get('config')['homestead_yaml'], $homestead);
-      $this->hostsFS->put(Container::get('config')['hosts_file'], $hosts);
+      // $this->homesteadFS->put(Container::get('config')['homestead_yaml'], $homestead);
+      // $this->hostsFS->put(Container::get('config')['hosts_file'], $hosts);
    }
 }
