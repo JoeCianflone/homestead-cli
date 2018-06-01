@@ -3,14 +3,13 @@
 require __DIR__.'/vendor/autoload.php';
 require __DIR__.'/src/Core/bootstrap.php';
 
-use App\Core\Container;
-use App\Commands\FreshCommand;
-use App\Commands\NewSiteCommand;
 use Symfony\Component\Console\Application;
+use App\Commands\{FreshCommand, NewSiteCommand, RebuildIndexCommand};
 
 
 $application = new Application();
 
 $application->add(new FreshCommand());
 $application->add(new NewSiteCommand());
+$application->add(new RebuildIndexCommand());
 $application->run();

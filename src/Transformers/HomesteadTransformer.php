@@ -2,86 +2,69 @@
 
 namespace App\Transformers;
 
-use App\Core\Container;
 use App\Transformers\BaseTransformer;
 use Symfony\Component\Console\Input\InputInterface;
 
 class HomesteadTransformer extends BaseTransformer {
 
-   private $file;
-
-   public function __construct(string $file)
+   public function __construct($file)
    {
+      parent::__construct();
       $this->file = $file;
    }
 
    public function transform(InputInterface $input)
    {
-      $this->file['folders'] = $this->updateFolders($this->file['folders'], $input->getArgument('folder'));
-      $this->file['sites'] = $this->updateSites($this->file['sites'], $input->getArgument('folder'), $input->getArgument('uri'), $input->getOption('pubdir'));
-      $this->file['databases'] = $this->updateDatabase($this->file['databases'], $input->getOption('database'));
+      $map = $this->generateNewMapping($input);
+      $items = $map[$input->getArgument('uri')];
+
+      $this->map->set($map);
+
+      $this->file['folders'][] = [
+         "map" => $items['local'],
+         "to" => $items['vm']
+      ];
+
+      $this->file['sites'][] = [
+         "map" => $items['uri'],
+         "to" => $items['vmPublic'],
+         "php" => $items['php']
+      ];
+
+      $this->file['databases'] = $this->addDatabase($this->file['databases'], $input->getOption('database'));
 
       return $this->file;
    }
 
-   private function updateFolders(string $file, string $folder)
-   {
-      $map = $this->getLocalPath($folder);
-      $to = $this->getVMPath($folder);
 
-      if ($this->foundInColumn($map, $file, 'map') || $this->foundInColumn($to, $file, 'to')) {
-         throw new \Exception("Folder or VM Location already exists in Folders...aborting");
+   private function addDatabase($file, $db)
+   {
+      if (is_null($db)) {
+         return $file;
       }
 
-      return $this->doMapping($file, $map, $to);
-   }
-
-   private function updateSites($file, $folder, $uri, $pubdir='')
-   {
-      $to = $this->getVMPath($folder, $pubdir);
-
-      if ($this->foundInColumn($uri, $file, 'map') || $this->foundInColumn($to, $file, 'to')) {
-         throw new \Exception("URI or Folder Name already exists in sites...aborting");
-      }
-
-      return $this->doMapping($file, $uri, $to);
-   }
-
-   private function updateDatabase(string $file, string $dbName)
-   {
-      if (in_array($dbName, $file)) {
+      if (in_array($db, $file)) {
          throw new \Exception('Database Already Exists...Aborting');
       }
 
-      if (! is_null($dbName)) {
-         $file[] = $dbName;
+      $file[] = $db;
+      return $file;
+   }
+
+   private function generateNewMapping(InputInterface $input)
+   {
+      if ($this->map->exists($input->getArgument('uri'))) {
+         throw new \Exception("URI exists aborting");
       }
 
-      return $file;
-   }
-
-   private function foundInColumn(string $needle, string $haystack, string $column)
-   {
-      return in_array($needle, array_column($haystack, $column));
-   }
-
-   private function doMapping($file, $map, $to)
-   {
-      $file[] = [
-         'map' => $map,
-         'to' => $to
+      return [
+         "{$input->getArgument('uri')}" => [
+            "uri" => $input->getArgument('uri'),
+            "local" => $this->config->get('local_base_path')."/{$input->getArgument('folder')}",
+            "vm" => rtrim($this->config->get('vm_base_path')."/{$input->getArgument('folder')}", '/'),
+            "vmPublic" => rtrim($this->config->get('vm_base_path')."/{$input->getArgument('folder')}/{$input->getOption('pubdir')}", '/'),
+            "php" => $input->getOption('php'),
+         ]
       ];
-
-      return $file;
-   }
-
-   private function getLocalPath(string $folder) : string
-   {
-      return trim(Container::get('config')['local_base_path'] . '/'. $folder, '/');
-   }
-
-   private function getVMPath(string $folder, string $pubdir='') : string
-   {
-      return rtrim(Container::get('config')['vm_base_path'] .'/'.$folder.'/'.$pubdir, '/');
    }
 }

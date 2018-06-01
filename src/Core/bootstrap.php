@@ -1,8 +1,6 @@
 <?php
 
-use App\Core\Config;
-use App\Core\Container;
+use App\Core\{Config, Indexer, Container};
 
-Container::bind('config', new Config(__DIR__ . '/../', 'cfg.php'));
-
-// App\Core\Container::bindFile('map', 'src/map.php');
+Container::bind('config', new Config(__DIR__ . '/../', '.env.config'));
+Container::bind('indexer', new Indexer(__DIR__ . '/../', '.env.index'));

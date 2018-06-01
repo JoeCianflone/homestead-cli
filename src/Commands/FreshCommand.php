@@ -31,15 +31,15 @@ class FreshCommand extends BaseCommand {
 
       $defaults = $this->systemDefaults();
 
-      Container::resolve('config')->set('homestead_path', $helper->ask($input, $output, new Question('Path to homestead ('.$defaults['homestead_path'].'): ', $defaults['homestead_path']))) ;
-      Container::resolve('config')->set('homestead_yaml', $helper->ask($input, $output, new Question('YAML file name (Homestead.yaml): ', 'Homestead.yaml')));
-      Container::resolve('config')->set('hosts_path', $helper->ask($input, $output, new Question('Path to Hosts file ('.$defaults['hosts_path'].'): ', $defaults['hosts_path'])));
-      Container::resolve('config')->set('hosts_file', $helper->ask($input, $output, new Question('Hostsfile name  (hosts): ', 'hosts')));
-      Container::resolve('config')->set('vm_ip', $helper->ask($input, $output, new Question('Homesteads IP Address (192.168.10.10): ', '192.168.10.10')));
-      Container::resolve('config')->set('vm_base_path', $helper->ask($input, $output, new Question('VM Base Path (/home/vagrant/sites): ', '/home/vagrant/sites')));
-      Container::resolve('config')->set('local_base_path', $helper->ask($input, $output, new Question('Local folder base path ('.$defaults['local_base_path'].'): ', $defaults['local_base_path'])));
+      $this->config->set('homestead_path', $helper->ask($input, $output, new Question('Path to homestead ('.$defaults['homestead_path'].'): ', $defaults['homestead_path']))) ;
+      $this->config->set('homestead_yaml', $helper->ask($input, $output, new Question('YAML file name (Homestead.yaml): ', 'Homestead.yaml')));
+      $this->config->set('hosts_path', $helper->ask($input, $output, new Question('Path to Hosts file ('.$defaults['hosts_path'].'): ', $defaults['hosts_path'])));
+      $this->config->set('hosts_file', $helper->ask($input, $output, new Question('Hostsfile name  (hosts): ', 'hosts')));
+      $this->config->set('vm_ip', $helper->ask($input, $output, new Question('Homesteads IP Address (192.168.10.10): ', '192.168.10.10')));
+      $this->config->set('vm_base_path', $helper->ask($input, $output, new Question('VM Base Path (/home/vagrant/sites): ', '/home/vagrant/sites')));
+      $this->config->set('local_base_path', $helper->ask($input, $output, new Question('Local folder base path ('.$defaults['local_base_path'].'): ', $defaults['local_base_path'])));
 
-      Container::resolve('config')->saveToDisk();
+      $this->config->saveToDisk();
    }
 
    private function systemDefaults() : array

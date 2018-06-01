@@ -10,7 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Transformers\{HostsTransformer, HomesteadTransformer};
 use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
 
-
 class NewSiteCommand extends BaseCommand {
 
    public function __construct()
@@ -34,24 +33,27 @@ class NewSiteCommand extends BaseCommand {
          ->addArgument('uri', InputArgument::REQUIRED, "URI for your local code")
 
          ->addOption('database', null, InputOption::VALUE_REQUIRED, "Add a DB to your YAML file too")
-         ->addOption('php', null, InputOption::VALUE_REQUIRED, "Version of PHP you want to use")
+         ->addOption('php', null, InputOption::VALUE_REQUIRED, "Version of PHP you want to use", "7.2")
          ->addOption('pubdir', null, InputOption::VALUE_REQUIRED, "Public folder for homestead");
    }
 
    protected function execute(InputInterface $input, OutputInterface $output)
    {
-      // $homestead = new HomesteadTransformer(Yaml::parseFile(Container::get('config')['homestead_path'] .'/'. Container::get('config')['homestead_yaml']));
-      // $updatedYamlFile = $homestead->transform($input);
+      $homestead = new HomesteadTransformer(Yaml::parseFile($this->config->get('homestead_path') .'/'. $this->config->get('homestead_yaml')));
+      $updatedYamlFile = $homestead->transform($input);
 
-      // $hosts = new HostsTransformer($this->hostsFS->read(Container::get('config')['hosts_file']));
-      // $updatedHostsFile = $hosts->transform($input);
+      $hosts = new HostsTransformer($this->hosts->read($this->config->get('hosts_file')));
+      $updatedHostsFile = $hosts->transform($input);
 
-      // $this->writeFilesToDisk(Yaml::dump($updatedYamlFile), $updatedHostsFile);
+      $this->writeFilesToDisk(Yaml::dump($updatedYamlFile), $updatedHostsFile);
+
    }
 
    private function writeFilesToDisk($homestead, $hosts)
    {
-      // $this->homesteadFS->put(Container::get('config')['homestead_yaml'], $homestead);
-      // $this->hostsFS->put(Container::get('config')['hosts_file'], $hosts);
+      $this->homestead->put($this->config->get('homestead_yaml'), $homestead);
+      $this->hosts->put($this->config->get('hosts_file'), $hosts);
+
+      $this->indexer->saveToDisk();
    }
 }
