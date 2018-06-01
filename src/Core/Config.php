@@ -24,7 +24,7 @@ class Config {
    public function get(string $key) : string
    {
       if (! array_key_exists ($key, $this->cfg)) {
-         return throw new \Exception("Config file not found, run vm fresh first");
+         throw new \Exception("Config file not found, run vm fresh first");
       }
 
       return $this->cfg[$key];
@@ -40,7 +40,7 @@ class Config {
       $this->fs->put($this->file, serialize($this->cfg));
    }
 
-   public function isEmpty() : boolean
+   public function isEmpty() : bool
    {
       return count($this->cfg) <= 0;
    }

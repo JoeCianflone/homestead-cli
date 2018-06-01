@@ -29,14 +29,14 @@ class FreshCommand extends BaseCommand {
    {
       $helper = $this->getHelper('question');
 
-      Container::get('config')->set('homestead_path', $helper->ask($input, $output, new Question('Path to homestead (/user/JoeCianflone/Homestead): ', '/user/JoeCianflone/Homestead'))) ;
-      Container::get('config')->set('homestead_yaml', $helper->ask($input, $output, new Question('YAML file name (Homestead.yaml): ', 'Homestead.yaml')));
-      Container::get('config')->set('hosts_path', $helper->ask($input, $output, new Question('Path to Hosts file (/etc): ', '/etc')));
-      Container::get('config')->set('hosts_file', $helper->ask($input, $output, new Question('Hostsfile name  (hosts): ', 'hosts')));
-      Container::get('config')->set('vm_ip', $helper->ask($input, $output, new Question('Homesteads IP Address (192.168.10.10): ', '192.168.10.10')));
-      Container::get('config')->set('vm_base_path', $helper->ask($input, $output, new Question('VM Base Path (/home/vagrant/sites): ', '/home/vagrant/sites')));
-      Container::get('config')->set('local_base_path', $helper->ask($input, $output, new Question('Local folder base path (~/Sites): ', '~/Sites')));
+      Container::resolve('config')->set('homestead_path', $helper->ask($input, $output, new Question('Path to homestead (/user/JoeCianflone/Homestead): ', '/user/JoeCianflone/Homestead'))) ;
+      Container::resolve('config')->set('homestead_yaml', $helper->ask($input, $output, new Question('YAML file name (Homestead.yaml): ', 'Homestead.yaml')));
+      Container::resolve('config')->set('hosts_path', $helper->ask($input, $output, new Question('Path to Hosts file (/etc): ', '/etc')));
+      Container::resolve('config')->set('hosts_file', $helper->ask($input, $output, new Question('Hostsfile name  (hosts): ', 'hosts')));
+      Container::resolve('config')->set('vm_ip', $helper->ask($input, $output, new Question('Homesteads IP Address (192.168.10.10): ', '192.168.10.10')));
+      Container::resolve('config')->set('vm_base_path', $helper->ask($input, $output, new Question('VM Base Path (/home/vagrant/sites): ', '/home/vagrant/sites')));
+      Container::resolve('config')->set('local_base_path', $helper->ask($input, $output, new Question('Local folder base path (~/Sites): ', '~/Sites')));
 
-      Container::get('config')->saveToDisk();
+      Container::resolve('config')->saveToDisk();
    }
 }

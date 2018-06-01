@@ -34,6 +34,7 @@ class NewSiteCommand extends BaseCommand {
          ->addArgument('uri', InputArgument::REQUIRED, "URI for your local code")
 
          ->addOption('database', null, InputOption::VALUE_REQUIRED, "Add a DB to your YAML file too")
+         ->addOption('php', null, InputOption::VALUE_REQUIRED, "Version of PHP you want to use")
          ->addOption('pubdir', null, InputOption::VALUE_REQUIRED, "Public folder for homestead");
    }
 

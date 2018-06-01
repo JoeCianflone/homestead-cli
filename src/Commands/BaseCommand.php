@@ -17,14 +17,16 @@ class BaseCommand extends Command {
    {
       parent::__construct();
 
-      $this->homestead = new Filesystem(new Local(Container::resolve('config')->get('homestead_path')));
-      $this->hosts = new Filesystem(new Local(Container::resolve('config')->get('hosts_path')));
+      if (! Container::resolve('config')->isEmpty()) {
+         $this->homestead = new Filesystem(new Local(Container::resolve('config')->get('homestead_path')));
+         $this->hosts = new Filesystem(new Local(Container::resolve('config')->get('hosts_path')));
+      }
    }
 
    public function checkHost() : Object
    {
       if (! is_writable(Container::resolve('config')->get('hosts_path').'/'.Container::resolve('config')->get('hosts_file'))) {
-         throw \Exception("Unable to write to the Hosts file, you should use sudo before running this command");
+         throw new \Exception("Cannot write to Host file, probably forgot sudo");
       }
 
       return $this;
@@ -33,7 +35,7 @@ class BaseCommand extends Command {
    public function checkConfig() : Object
    {
       if (Container::resolve('config')->isEmpty()) {
-         throw \Exception("No configuration file found, please run vm fresh first");
+           throw new \Exception("No config found, please run vm fresh");
       }
 
       return $this;
