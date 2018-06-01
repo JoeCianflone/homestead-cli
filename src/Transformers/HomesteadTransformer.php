@@ -18,7 +18,7 @@ class HomesteadTransformer extends BaseTransformer {
       $map = $this->generateNewMapping($input);
       $items = $map[$input->getArgument('uri')];
 
-      $this->map->set($map);
+      $this->indexer->set($map);
 
       $this->file['folders'][] = [
          "map" => $items['local'],
@@ -53,7 +53,7 @@ class HomesteadTransformer extends BaseTransformer {
 
    private function generateNewMapping(InputInterface $input)
    {
-      if ($this->map->exists($input->getArgument('uri'))) {
+      if ($this->indexer->exists($input->getArgument('uri'))) {
          throw new \Exception("URI exists aborting");
       }
 
