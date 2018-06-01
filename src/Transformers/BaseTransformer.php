@@ -5,12 +5,12 @@ use App\Core\Container;
 
 class BaseTransformer {
 
-   protected $config;
-   protected $map;
    protected $file;
+   protected $config;
+   protected $indexer;
 
    public function __construct() {
       $this->config = Container::resolve('config');
-      $this->map = Container::resolve('map');
+      $this->indexer = Container::resolve('indexer');
    }
 }

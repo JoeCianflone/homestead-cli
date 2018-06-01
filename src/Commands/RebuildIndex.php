@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Transformers\{HostsTransformer, HomesteadTransformer};
 use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
 
-class RebuildIndexCommand extends BaseCommand {
+class RebuildIndex extends Base {
 
    public function __construct()
    {
@@ -20,7 +20,7 @@ class RebuildIndexCommand extends BaseCommand {
    {
       $this
          ->setName('rebuild')
-         ->setDescription('Rebuids the internal map needed for other features')
+         ->setDescription('Rebuids the internal index needed for fast searching')
          ->setHelp('');
 
    }

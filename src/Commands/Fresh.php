@@ -2,14 +2,13 @@
 namespace App\Commands;
 
 use App\Core\Container;
-use App\Commands\BaseCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
 
 
-class FreshCommand extends BaseCommand {
+class Fresh extends Base {
 
    public function __construct()
    {

@@ -4,12 +4,12 @@ require __DIR__.'/vendor/autoload.php';
 require __DIR__.'/src/Core/bootstrap.php';
 
 use Symfony\Component\Console\Application;
-use App\Commands\{FreshCommand, NewSiteCommand, RebuildIndexCommand};
+use App\Commands\{Fresh, NewSite, RebuildIndex};
 
 
 $application = new Application();
 
-$application->add(new FreshCommand());
-$application->add(new NewSiteCommand());
-$application->add(new RebuildIndexCommand());
+$application->add(new Fresh());
+$application->add(new NewSite());
+$application->add(new RebuildIndex());
 $application->run();

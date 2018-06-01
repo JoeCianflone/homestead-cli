@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use App\Transformers\{HostsTransformer, HomesteadTransformer};
 use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
 
-class NewSiteCommand extends BaseCommand {
+class NewSite extends Base {
 
    public function __construct()
    {

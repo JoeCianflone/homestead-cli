@@ -8,7 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
 
-class BaseCommand extends Command {
+class Base extends Command {
 
    protected $homestead;
    protected $hosts;
