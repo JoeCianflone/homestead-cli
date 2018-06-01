@@ -9,6 +9,19 @@ use App\Commands\{Fresh, NewSite, RebuildIndex};
 
 $application = new Application();
 
+/**
+ * Not all these commands exist yet
+ *
+ * php vm fresh
+ * php vm new
+ * php vm new:yaml
+ * php vm new:db
+ * php vm rebuild
+ * php vm remove
+ * php vm remove:db
+ * php vm update:yaml
+ */
+
 $application->add(new Fresh());
 $application->add(new NewSite());
 $application->add(new RebuildIndex());
